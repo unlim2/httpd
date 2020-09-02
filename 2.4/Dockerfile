@@ -1,5 +1,7 @@
 FROM debian:buster-slim
 
+ENV CUSTOM_PATCHES "https://gitlab.com/someuser2/httpd2-patches/-/raw/master/vhost-print-aliases/2.4.46/patch.diff?inline=false"
+
 # add our user and group first to make sure their IDs get assigned consistently, regardless of whatever dependencies get added
 #RUN groupadd -r www-data && useradd -r --create-home -g www-data www-data
 
@@ -172,7 +174,7 @@ RUN set -eux; \
 		done; \
 	}; \
 	patches $HTTPD_PATCHES; \
-	\
+	for patch_url in "$CUSTOM_PATCHES"; do wget -qO- "$patch_url" | patch -p1 ; done; \
 	gnuArch="$(dpkg-architecture --query DEB_BUILD_GNU_TYPE)"; \
 	CFLAGS="$(dpkg-buildflags --get CFLAGS)"; \
 	CPPFLAGS="$(dpkg-buildflags --get CPPFLAGS)"; \
